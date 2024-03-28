@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyrics Finder</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Changed height to min-height for footer placement */
+        background-color: #f0f0f0;
+    }
+    .container {
+        text-align: center;
+        margin-bottom: 20px; /* Added margin at the bottom */
+        width: 100%;
+        display: center;
+    }
+
+    input[type="text"] {
+        padding: 10px;
+        margin-bottom: 10px;
+        width: 300px;
+        font-size: 16px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    #lyrics {
+        margin-top: 20px;
+        white-space: pre-line;
+        height: 300px; /* Fixed height for lyrics container */
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding: 10px; /* Add padding for better readability */
+        margin-bottom: 20px;
+    }
+    footer {
+        /* position: fixed; */
+        display: center;
+        bottom: 0;
+        width: 100%;
+        background-color: #f9f9f9;
+        padding: 20px;
+        text-align: left;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Lyrics Finder</h2>
+    <input type="text" id="artist" placeholder="Enter Artist Name">
+    <br>
+    <input type="text" id="song" placeholder="Enter Song Title">
+    <br>
+    <button onclick="fetchLyrics()">Get Lyrics</button>
+    <div id="lyrics"></div>
+
+    <footer>
+        <h3>About the API</h3>
+        <p>The Lyrics.ovh API provides access to a vast database of song lyrics. Users can retrieve lyrics for specific songs by providing the artist's name and the song title.</p>
+        <p>API Source: <a href="https://lyricsovh.docs.apiary.io/#">Lyrics.ovh API Documentation</a></p>
+        <h3>API Parameters</h3>
+        <p>The API request requires two parameters:</p>
+        <ul>
+            <li><strong>Artist Name:</strong> Specifies the name of the artist whose song lyrics are requested.</li>
+            <li><strong>Song Title:</strong> Specifies the title of the song for which lyrics are requested.</li>
+        </ul>
+        <h3>Applications</h3>
+        <p>This API can be useful in various applications, including:</p>
+        <ol>
+            <li>Music streaming platforms can integrate this API to display song lyrics to users.</li>
+            <li>Lyrics websites or apps can use this API to provide lyrics search functionality.</li>
+        </ol>
+    </footer>
+</div>
+
+<script>
+function fetchLyrics() {
+    var artist = document.getElementById("artist").value;
+    var song = document.getElementById("song").value;
+    
+    if (!artist || !song) {
+        alert("Please enter both artist name and song title");
+        return;
+    }
+    
+    var apiUrl = "https://api.lyrics.ovh/v1/" + artist + "/" + song;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.lyrics) {
+                // Remove the first line from the lyrics
+                var lyricsWithoutFirstLine = removeFirstLine(data.lyrics);
+                document.getElementById("lyrics").innerText = lyricsWithoutFirstLine;
+            } else {
+                document.getElementById("lyrics").innerText = "Lyrics not found for the given artist and song title.";
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById("lyrics").innerText = "An error occurred while fetching lyrics.";
+        });
+}
+
+function removeFirstLine(lyrics) {
+    // Split the lyrics by newline characters
+    var lines = lyrics.split('\n');
+    // Remove the first line
+    lines.shift();
+    // Join the remaining lines back into a single string
+    return lines.join('\n');
+}
+</script>
+</body>
+</html>
